@@ -1,3 +1,80 @@
+# Chargement du module Windows Forms
+Add-Type -AssemblyName System.Windows.Forms
+
+# Création d'une nouvelle fenêtre
+$form = New-Object System.Windows.Forms.Form
+$form.Text = "Installation et désinstallation de VLC"
+$form.ClientSize = New-Object System.Drawing.Size(400, 300)
+
+# Chargement de l'image à utiliser comme arrière-plan
+$imagePath = "C:\Users\Mist\Desktop\bg.jpg"
+$image = [System.Drawing.Image]::FromFile($imagePath)
+
+# Utilisation de l'image comme arrière-plan de la fenêtre
+$form.BackgroundImage = $image
+$form.BackgroundImageLayout = "Stretch" # étirement de l'image pour couvrir tout l'espace
+
+# Création d'un bouton pour l'installation de VLC
+$installButton = New-Object System.Windows.Forms.Button
+$installButton.Text = "Installer VLC"
+$installButton.Location = New-Object System.Drawing.Point(10, 10)
+$installButton.add_Click({
+    # URL de téléchargement de VLC
+    $url = "https://get.videolan.org/vlc/3.0.16/win64/vlc-3.0.16-win64.exe"
+    
+    # Emplacement de téléchargement du fichier d'installation
+    $path = "$env:USERPROFILE\Downloads\vlc-3.0.16-win64.exe"
+    
+    # Téléchargement du fichier d'installation
+    (New-Object System.Net.WebClient).DownloadFile($url, $path)
+    
+    # Installation de VLC en utilisant le fichier téléchargé
+    Start-Process $path -ArgumentList "/S" -Wait
+    
+    # Suppression du fichier d'installation
+    Remove-Item $path
+})
+
+# Création d'un bouton pour la désinstallation de VLC
+$uninstallButton = New-Object System.Windows.Forms.Button
+$uninstallButton.Text = "Désinstaller VLC"
+$uninstallButton.Location = New-Object System.Drawing.Point(10, 50)
+$uninstallButton.add_Click({
+    # Emplacement du programme d'installation de VLC
+    $uninstallPath = "C:\Program Files\VideoLAN\VLC\uninstall.exe"
+    
+    # Désinstallation de VLC
+    Start-Process $uninstallPath -ArgumentList "/S" -Wait
+})
+
+# Ajout des boutons à la fenêtre
+$form.Controls.Add($installButton)
+$form.Controls.Add($uninstallButton)
+
+# Affichage de la fenêtre
+$form.ShowDialog()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $computerName = "Computer Name"
 $softwareName = "VLC media player"
 

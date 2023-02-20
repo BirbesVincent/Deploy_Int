@@ -1,0 +1,39 @@
+$computerName = "Computer Name"
+$softwareName = "VLC media player"
+
+# Vérifier si le logiciel est déjà installé
+$software = Get-WmiObject -Class Win32_Product -ComputerName $computerName | Where-Object { $_.Name -eq $softwareName }
+if ($software) {
+    Write-Host "$softwareName est déjà installé sur $computerName."
+}
+else {
+    # Télécharger le fichier d'installation
+    $sourcePath = "\\serveur\chemin\vers\VLC.exe"
+    $destinationPath = "\\$computerName\c$\temp\VLC.exe"
+    Copy-Item -Path $sourcePath -Destination $destinationPath -Force
+
+    # Installer le logiciel
+    Start-Process -FilePath $destinationPath -ArgumentList "/S" -Wait
+
+    # Vérifier la version installée et mettre à jour si nécessaire
+    $installedVersion = (Get-ItemProperty HKLM:\Software\VideoLAN\VLC -Name DisplayVersion).DisplayVersion
+    $latestVersion = Invoke-WebRequest "https://get.videolan.org/vlc/last/win64/" -UseBasicParsing | Select-String -Pattern 'href="(.+?)".+?VLC media player' | ForEach-Object { $_.Matches.Groups[1].Value }
+    $latestVersion = ($latestVersion -split '/' | Select-Object -Last 1) -replace '_win64.exe$'
+
+    if ($installedVersion -lt $latestVersion) {
+        Write-Host "Une nouvelle version de $softwareName est disponible."
+        Write-Host "Version installée : $installedVersion"
+        Write-Host "Dernière version disponible : $latestVersion"
+
+        # Télécharger le fichier d'installation de la dernière version
+        $sourcePath = "https://get.videolan.org/vlc/$latestVersion/win64/vlc-$latestVersion-win64.exe"
+        $destinationPath = "\\$computerName\c$\temp\vlc-$latestVersion-win64.exe"
+        Invoke-WebRequest $sourcePath -OutFile $destinationPath
+
+        # Mettre à jour le logiciel
+        Start-Process -FilePath $destinationPath -ArgumentList "/S" -Wait
+    }
+    else {
+        Write-Host "$softwareName est déjà à jour sur $computerName."
+    }
+}

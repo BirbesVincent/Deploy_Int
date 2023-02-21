@@ -1,27 +1,22 @@
 # Définir le nom de l'ordinateur distant
 $computerName = "NomDeLOrdinateurDistant"
 
-# Vérifier si l'utilisateur actuel a les privilèges administratifs sur l'ordinateur distant
-if (-not (Test-Connection $computerName -Quiet)) {
-    Write-Warning "Impossible de contacter l'ordinateur distant."
-    exit
-}
-if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent($computerName)).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    Write-Warning "Vous devez exécuter ce script en tant qu'administrateur sur l'ordinateur distant."
-    exit
-}
-
-# Définir le chemin d'accès à la clé de registre sur l'ordinateur distant
+# Définir le chemin d'accès à la clé de registre à récupérer
 $regPath = "HKLM:\SOFTWARE\Policies\Google\Update"
-$reg = [Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey([Microsoft.Win32.RegistryHive]::LocalMachine, $computerName)
-$key = $reg.OpenSubKey("SOFTWARE\Policies\Google\Update")
+$keyName = "UpdateDefault"
 
-# Récupérer la valeur de la clé de registre
-$value = $key.GetValue("UpdateDefault")
+# Définir le chemin d'accès à PsExec sur votre ordinateur
+$psexecPath = "C:\chemin\vers\psexec.exe"
+
+# Exécuter PsExec pour récupérer la valeur de la clé de registre
+$command = "$psexecPath \\\\$computerName reg query '$regPath' /v '$keyName'"
+$output = Invoke-Expression $command
+
+# Récupérer la valeur de la clé de registre à partir de la sortie de la commande
+$value = ($output -split "\s+")[-1]
 
 # Afficher la valeur de la clé de registre
 Write-Host "La valeur de la clé UpdateDefault est : $value"
-
 
 
 

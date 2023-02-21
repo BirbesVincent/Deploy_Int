@@ -60,7 +60,23 @@ $form.ShowDialog()
 
 
 
+//
+# Ajout d'une barre de progression
+$progressBar = New-Object System.Windows.Forms.ProgressBar
+$progressBar.Location = New-Object System.Drawing.Point(50, 100)
+$progressBar.Size = New-Object System.Drawing.Size(300, 20)
+$form.Controls.Add($progressBar)
 
+# Fonction pour installer VLC
+function InstallVLC {
+    # Simuler l'installation en mettant à jour la barre de progression
+    for ($i = 0; $i -le 100; $i += 10) {
+        Start-Sleep -Milliseconds 500 # attente de 500 millisecondes
+        $progressBar.Value = $i
+    }
+    # Installation terminée
+    [System.Windows.Forms.MessageBox]::Show("VLC a été installé avec succès !")
+}
 
 
 

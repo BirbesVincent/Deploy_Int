@@ -1,3 +1,20 @@
+$uninstallString = (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\{EFC450E9-F50D-482F-8FAB-DFF62C5C5FB7}").UninstallString
+$uninstallArgs = $uninstallString.Split(" ")[1..($uninstallString.Split(" ").Count-1)]
+Start-Process -FilePath $uninstallString.Split(" ")[0] -ArgumentList $uninstallArgs -Wait
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Définir le nom de l'ordinateur distant
 $computerName = "NomDeLOrdinateurDistant"
 

@@ -1,6 +1,21 @@
-$uninstallString = (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\{EFC450E9-F50D-482F-8FAB-DFF62C5C5FB7}").UninstallString
-$uninstallArgs = $uninstallString.Split(" ")[1..($uninstallString.Split(" ").Count-1)]
-Start-Process -FilePath $uninstallString.Split(" ")[0] -ArgumentList $uninstallArgs -Wait
+# Définir la clé de registre correspondant à l'application que vous voulez désinstaller
+$regPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{application-guid}"
+
+# Récupérer les informations d'installation de l'application depuis la clé de registre
+$regData = Get-ItemProperty -Path $regPath
+
+# Vérifier que les informations de désinstallation sont disponibles
+if ($regData.UninstallString) {
+
+    # Démarrer le processus de désinstallation
+    Start-Process $regData.UninstallString -Wait
+
+} else {
+
+    # Si les informations de désinstallation ne sont pas disponibles, afficher un message d'erreur
+    Write-Error "Impossible de trouver les informations de désinstallation pour cette application."
+
+}
 
 
 
